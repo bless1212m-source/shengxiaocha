@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生肖查询器</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 30px 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        h1 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 28px;
+        }
+        .sub {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+        input {
+            width: 80%;
+            padding: 12px 15px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 30px;
+            outline: none;
+            transition: 0.3s;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        input:focus {
+            border-color: #764ba2;
+        }
+        button {
+            background: #764ba2;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 20px;
+        }
+        button:hover {
+            background: #5a3a7a;
+            transform: scale(1.02);
+        }
+        .result {
+            font-size: 24px;
+            font-weight: bold;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            margin-top: 10px;
+            color: #764ba2;
+        }
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .footer {
+            margin-top: 25px;
+            font-size: 12px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🐉 生肖查询器</h1>
+    <div class="sub">输入年份（如1995）或年龄（如30）</div>
+    <input type="number" id="inputValue" placeholder="例如：1995 或 30">
+    <button onclick="getZodiac()">查询生肖</button>
+    <div id="result" class="result">等待输入...</div>
+    <div id="error" class="error"></div>
+    <div class="footer">年龄按周岁计算（基于2026年）</div>
+</div>
+
+<script>
+    function getZodiac() {
+        // 获取输入值
+        let input = document.getElementById("inputValue").value;
+        let errorDiv = document.getElementById("error");
+        let resultDiv = document.getElementById("result");
+        
+        // 清空之前的错误和结果
+        errorDiv.innerHTML = "";
+        resultDiv.innerHTML = "查询中...";
+        
+        // 检查是否为空
+        if (input === "") {
+            errorDiv.innerHTML = "请输入年份或年龄";
+            resultDiv.innerHTML = "等待输入...";
+            return;
+        }
+        
+        let num = Number(input);
+        // 检查是否为有效数字
+        if (isNaN(num) || !Number.isInteger(num)) {
+            errorDiv.innerHTML = "请输入整数（年份或年龄）";
+            resultDiv.innerHTML = "等待输入...";
+            return;
+        }
+        
+        const currentYear = 2026;
+        const zodiacs = ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"];
+        const baseYear = 1900;  // 1900年是鼠年
+        
+        let year;
+        // 判断输入是年份还是年龄
+        if (num > 100 && num <= currentYear) {
+            // 视为年份
+            year = num;
+            // 年份范围检查
+            if (year < 1900) {
+                errorDiv.innerHTML = "年份不能小于1900年";
+                resultDiv.innerHTML = "等待输入...";
+                return;
+            }
+        } else {
+            // 视为年龄
+            if (num < 0 || num > 120) {
+                errorDiv.innerHTML = "年龄请输入0~120之间的数字";
+                resultDiv.innerHTML = "等待输入...";
+                return;
+            }
+            year = currentYear - num;
+        }
+        
+        // 计算生肖索引
+        let index = (year - baseYear) % 12;
+        // 确保索引为正
+        index = (index + 12) % 12;
+        let zodiac = zodiacs[index];
+        
+        // 显示结果
+        if (num > 100 && num <= currentYear) {
+            resultDiv.innerHTML = `${num}年 → 属 ${zodiac}`;
+        } else {
+            resultDiv.innerHTML = `${num}岁（${year}年出生） → 属 ${zodiac}`;
+        }
+        errorDiv.innerHTML = "";
+    }
+    
+    // 支持回车键查询
+    document.getElementById("inputValue").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            getZodiac();
+        }
+    });
+</script>
+</body>
+</html>
